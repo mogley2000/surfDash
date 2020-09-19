@@ -1,0 +1,7 @@
+{
+    "python.pythonPath": "/Users/mogley/Downloads/code/surfDash/surfDashvenv/bin/python3",
+    "python.linting.pylintEnabled": false,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.enabled": true,
+    "python.formatting.provider": "black"
+}
