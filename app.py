@@ -1,12 +1,10 @@
-
-
-
-
 from flask import Flask, render_template
-app = Flask(__name__) #app object from Flask class. Argument is __name__
+from scraper import elemDate
+
+app = Flask(__name__)   # app object from Flask class. Argument is __name__
 @app.route("/")
 def home():
-    return render_template('home.html')
+    return render_template('home.html', elemDate=elemDate)
 
 @app.route('/salvador')
 def salvador():
@@ -15,12 +13,9 @@ def salvador():
 @app.route('/about')
 def about():
     name = "Monkey Rabbit testing Jinja"
-    return render_template('about.html', name = name )
- 
+    return render_template('about.html', name=name)
+
 @app.route('/manly')
 def manly():
     return render_template('manly.html')
-
-if __name__ == '__main__':
-    app.run()
 
