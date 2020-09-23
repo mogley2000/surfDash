@@ -24,19 +24,17 @@ def getData(html, attribute, _class, index):
     return result
 
 date = getData(forecast, "div", "tip_date_time", 0)
+wave = getData(forecast, "span", "tip_wave", 0)
+wind = getData(forecast, "span", "tip_wind", 0)
 train1 = getData(forecast, "div", "tip_train", 0)
 train2 = getData(forecast, "div", "tip_train", 1)
-wave = getData(forecast, "span", "tip_wave", 0)
 
-logging.debug(date)
-logging.debug(train1)
-logging.debug(train2)
-logging.debug(wave)
 
-forecast_data = list(zip(date, train1, train2, wave))
-headers = ["Date", "Primary Swell", "Secondary Swell", "Wave Height"]
+forecast_data = list(zip(date, wave, wind, train1, train2))
+headers = ["Date", "Wave Height", "Wind", "Primary Swell", "Secondary Swell"]
 
-print(tabulate([*forecast_data], headers=headers))
+tabulated = tabulate([*forecast_data], headers=headers)
+print(tabulated)
 
 #for tag in forecast:
 #    secondary = tag.find("div", {"class": "tip_train"})

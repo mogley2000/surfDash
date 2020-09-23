@@ -1,10 +1,12 @@
 from flask import Flask, render_template
-from scraper import elemDate
+import scraper
+from tabulate import tabulate 
 
 app = Flask(__name__)   # app object from Flask class. Argument is __name__
 @app.route("/")
 def home():
-    return render_template('home.html', elemDate=elemDate)
+    tabulated = scraper.tabulated
+    return render_template('home.html', tabulated=tabulated)
 
 @app.route('/salvador')
 def salvador():
