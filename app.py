@@ -1,12 +1,11 @@
 from flask import Flask, render_template
-import scraper
-from tabulate import tabulate 
+from scraper import runScraper
 
 app = Flask(__name__)   # app object from Flask class. Argument is __name__
 @app.route("/")
 def home():
-    tabulated = scraper.tabulated
-    return render_template('home.html', tabulated=tabulated)
+    flask_runScraper = runScraper()
+    return render_template('home.html', runScraper=flask_runScraper)
 
 @app.route('/salvador')
 def salvador():
@@ -15,9 +14,12 @@ def salvador():
 @app.route('/about')
 def about():
     name = "Monkey Rabbit testing Jinja"
-    return render_template('about.html', name=name)
+    return (name)
 
 @app.route('/manly')
 def manly():
-    return render_template('manly.html')
+    flask_runScraper = runScraper()
+    return render_template('manly.html', runScraper=flask_runScraper)
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0',port=5000, debug=True)

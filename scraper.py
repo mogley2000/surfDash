@@ -1,9 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 import logging
-import logging
 logging.basicConfig(level=logging.DEBUG, format=' %(asctime)s -  %(levelname)s-  %(message)s')
 from tabulate import tabulate 
+import json
 
 # northern beaches swellnet
 
@@ -16,25 +16,100 @@ forecast = soup.find_all("div", {"class": "forecast_tip"}) # scrapes the swell t
 def getData(html, attribute, _class, index):
     result = []
     for tag in html:
-        for item in tag.find_all(attribute, {"class": _class})[index]:
-            if item is not None:
-                result.append(item)
-            else:
-                result.append("N/A")
+        try:
+            for item in tag.find_all(attribute, {"class": _class})[index]:
+                if item is not None:
+                    result.append(item)
+                else:
+                    result.append("N/A")
+        except IndexError:
+            result.append("N/A")
     return result
 
-date = getData(forecast, "div", "tip_date_time", 0)
-wave = getData(forecast, "span", "tip_wave", 0)
-wind = getData(forecast, "span", "tip_wind", 0)
-train1 = getData(forecast, "div", "tip_train", 0)
-train2 = getData(forecast, "div", "tip_train", 1)
+def runScraper():
+    date = getData(forecast, "div", "tip_date_time", 0)
+    wave = getData(forecast, "span", "tip_wave", 0)
+    wind = getData(forecast, "span", "tip_wind", 0)
+    train1 = getData(forecast, "div", "tip_train", 0)
+    train2 = getData(forecast, "div", "tip_train", 1)
+
+    forecast_data = list(zip(date, wave, wind, train1, train2))
+    headers = ["Date", "Wave Height", "Wind", "Primary Swell", "Secondary Swell"]
+   
+    tabulated = tabulate([*forecast_data], headers=headers, tablefmt = 'html')
+    #print(tabulated)
+
+    return(tabulated)
+
+#scrape tide data from willyweather
+url_tide = 'https://tides.willyweather.com.au/nsw/sydney/fort-denison.html'
+res_tide = requests.get(url_tide)
+res_tide.raise_for_status
+soup_tide = BeautifulSoup(res_tide.content, 'html.parser')
+forecast_tide = soup_tide.find("section", {"class": "forecast"})
+day_block = forecast_tide.find_all("time")
+#day_1 = day_block[0]
+#day_2 = day_block[1]
+#day_3 = day_block[2]
+#day_4 = day_block[3]
+#day_5 = day_block[4]
+
+#tide_data = []
+#for tag in day_1.next_sibling:
+#    tide = tag.get_text(" / ")
+#    tide_data.append(tide)
+
+#print(tide_data)
 
 
-forecast_data = list(zip(date, wave, wind, train1, train2))
-headers = ["Date", "Wave Height", "Wind", "Primary Swell", "Secondary Swell"]
 
-tabulated = tabulate([*forecast_data], headers=headers)
-print(tabulated)
+def getTideData(html, index):
+    tide_data=[]
+    for tag in html[index].next_sibling:
+        tide_data.append(tag.get_text(" / ")) 
+    return tide_data
+
+def runTideDataScraper():
+    day_1 = getTideData(day_block, 0)
+    day_2 = getTideData(day_block, 1)
+    day_3 = getTideData(day_block, 2)
+    day_4 = getTideData(day_block, 3)
+    day_5 = getTideData(day_block, 4)
+    forecast_tideData = list(zip(day_1, day_2, day_3, day_4, day_5))
+    print(forecast_tideData)
+runTideDataScraper()
+
+
+
+
+    #for item in tag.find_all(["time", "li", {"class": ["point-low", "point-high"]}]):
+     #  print(item)
+
+
+# scrape bom json for north head 
+#bom_northhead_url = "http://www.bom.gov.au/fwo/IDN60701/IDN60701.95768.json"
+#northhead_res = requests.get(bom_northhead_url)
+#northhead_res.raise_for_status
+#json_data = json.loads(northhead_res.text)
+#logging.debug(type(json_data))
+
+#def json_print(order, attribute):
+    #print(json_data['observations']['data'][order][attribute])
+
+#json_print(0, 'local_date_time')
+#json_print(1, 'local_date_time')
+
+
+#for item in json_data['observations']['data']:
+    #print(item['local_date_time'])
+
+    
+        #for subitem in item['local_date_time']:
+        #print (subitem) 
+
+
+
+
 
 #for tag in forecast:
 #    secondary = tag.find("div", {"class": "tip_train"})
